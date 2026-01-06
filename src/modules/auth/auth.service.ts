@@ -138,9 +138,6 @@ export class AuthService {
   async getProfile(agentId: string) {
     const agent = await this.prisma.agent.findUnique({
       where: { id: agentId },
-      include: {
-        wallet: true,
-      },
       select: {
         id: true,
         agencyName: true,

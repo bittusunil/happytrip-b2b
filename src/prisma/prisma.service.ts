@@ -13,27 +13,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         { level: 'warn', emit: 'event' },
       ],
     });
+
+    // Set up event listeners after construction
+    (this as any).$on('query', (e: any) => {
+      this.logger.debug(`Query: ${e.query}`);
+      this.logger.debug(`Params: ${e.params}`);
+      this.logger.debug(`Duration: ${e.duration}ms`);
+    });
+
+    (this as any).$on('error', (e: any) => {
+      this.logger.error(`Database error: ${e.message}`);
+    });
+
+    (this as any).$on('warn', (e: any) => {
+      this.logger.warn(`Database warning: ${e.message}`);
+    });
   }
 
   async onModuleInit() {
     await this.$connect();
-
-    // Log queries in development
-    if (process.env.NODE_ENV === 'development') {
-      this.$on('query' as any, (e: any) => {
-        this.logger.debug(`Query: ${e.query}`);
-        this.logger.debug(`Params: ${e.params}`);
-        this.logger.debug(`Duration: ${e.duration}ms`);
-      });
-    }
-
-    this.$on('error' as any, (e: any) => {
-      this.logger.error(`Database error: ${e.message}`);
-    });
-
-    this.$on('warn' as any, (e: any) => {
-      this.logger.warn(`Database warning: ${e.message}`);
-    });
 
     this.logger.log('Database connected successfully');
   }

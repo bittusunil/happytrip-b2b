@@ -47,7 +47,7 @@ export class BookingsController {
               id: { type: 'string' },
               bookingReference: { type: 'string', example: 'HTB2025011500001' },
               bookingType: { type: 'string', enum: ['Flight', 'Hotel', 'FlightPlusHotel'] },
-              bookingStatus: { type: 'string', enum: BookingStatus },
+              bookingStatus: { type: 'string', enum: Object.values(BookingStatus) },
               paymentStatus: { type: 'string' },
               totalAmount: { type: 'number' },
               currency: { type: 'string', example: 'INR' },

@@ -167,21 +167,9 @@ For list endpoints, use these query parameters:
         'support@happytrip.com',
       )
       .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-      .addServer(
-        'http://localhost:3000',
-        'Local Development',
-        'Development environment',
-      )
-      .addServer(
-        'https://api-staging.happytrip.com',
-        'Staging',
-        'Staging environment',
-      )
-      .addServer(
-        'https://api.happytrip.com',
-        'Production',
-        'Production environment',
-      )
+      .addServer('http://localhost:3000', 'Local Development')
+      .addServer('https://api-staging.happytrip.com', 'Staging')
+      .addServer('https://api.happytrip.com', 'Production')
       .addBearerAuth(
         {
           type: 'http',

@@ -174,7 +174,7 @@ export class AgentsService {
       throw new NotFoundException('Agent not found');
     }
 
-    const usedCredit = agent.wallet?.usedCredit || 0;
+    const usedCredit = Number(agent.wallet?.usedCredit || 0);
     const availableCredit = creditLimit - usedCredit;
 
     await this.prisma.agent.update({

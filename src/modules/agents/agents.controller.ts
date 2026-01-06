@@ -127,7 +127,7 @@ export class AgentsController {
               agencyCode: { type: 'string', example: 'HAPPY001' },
               email: { type: 'string', example: 'john@happytravels.com' },
               phone: { type: 'string', example: '+919876543210' },
-              status: { type: 'string', enum: AgentStatus },
+              status: { type: 'string', enum: Object.values(AgentStatus) },
               verificationStatus: { type: 'string' },
               walletBalance: { type: 'number' },
               creditLimit: { type: 'number' },

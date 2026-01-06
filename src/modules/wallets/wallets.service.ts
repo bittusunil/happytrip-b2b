@@ -14,7 +14,16 @@ export class WalletsService {
       throw new NotFoundException('Wallet not found');
     }
 
-    return wallet;
+    // Convert Decimal fields to numbers
+    return {
+      ...wallet,
+      currentBalance: Number(wallet.currentBalance),
+      availableBalance: Number(wallet.availableBalance),
+      blockedBalance: Number(wallet.blockedBalance),
+      creditLimit: Number(wallet.creditLimit),
+      availableCredit: Number(wallet.availableCredit),
+      usedCredit: Number(wallet.usedCredit),
+    };
   }
 
   async getTransactions(agentId: string, page = 1, limit = 10) {
