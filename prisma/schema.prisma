@@ -1,0 +1,978 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum AgentStatus {
+  Pending
+  Active
+  Inactive
+  Suspended
+  Blocked
+}
+
+enum VerificationStatus {
+  Unverified
+  Submitted
+  UnderReview
+  Verified
+  Rejected
+}
+
+enum BusinessType {
+  OTA
+  TravelAgency
+  Corporate
+  Individual
+}
+
+enum BookingStatus {
+  Pending
+  Confirmed
+  Processing
+  Failed
+  Cancelled
+  Refunded
+}
+
+enum PaymentStatus {
+  Pending
+  Partial
+  Completed
+  Failed
+  Refunded
+}
+
+enum BookingType {
+  Flight
+  Hotel
+  FlightPlusHotel
+}
+
+enum TransactionType {
+  Credit
+  Debit
+  CreditAdjustment
+  DebitAdjustment
+  Refund
+}
+
+enum TransactionCategory {
+  Recharge
+  Booking
+  Cancellation
+  Refund
+  Commission
+  Adjustment
+  Fee
+  CreditUsed
+  CreditRepayment
+}
+
+enum WalletStatus {
+  Active
+  Frozen
+  Blocked
+}
+
+enum UserRole {
+  Owner
+  Admin
+  Manager
+  Staff
+}
+
+enum UserStatus {
+  Active
+  Inactive
+  Suspended
+}
+
+enum Status {
+  Active
+  Inactive
+}
+
+enum CustomerTitle {
+  Mr
+  Mrs
+  Ms
+  Dr
+}
+
+enum MarkupType {
+  Percentage
+  Fixed
+}
+
+enum PaymentMethod {
+  Wallet
+  Credit
+  PaymentGateway
+  Mixed
+}
+
+enum CabinClass {
+  Economy
+  PremiumEconomy
+  Business
+  First
+}
+
+enum PassengerTitle {
+  Mr
+  Mrs
+  Ms
+  Dr
+  Mstr
+  Inf
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+enum PassengerType {
+  Adult
+  Child
+  Infant
+}
+
+enum MealPlan {
+  RoomOnly
+  Breakfast
+  HalfBoard
+  FullBoard
+  AllInclusive
+}
+
+enum TransactionStatus {
+  Pending
+  Completed
+  Failed
+  Cancelled
+}
+
+enum CreditTransactionType {
+  CreditUsed
+  CreditRepayment
+  CreditLimitChange
+}
+
+enum PaymentType {
+  WalletRecharge
+  BookingPayment
+  Refund
+  CreditRepayment
+  PartialPayment
+}
+
+enum PaymentGateway {
+  Razorpay
+  Stripe
+  Paytm
+  PhonePe
+  PayU
+  CCAvenue
+}
+
+enum PaymentGatewayStatus {
+  Initiated
+  Pending
+  Completed
+  Failed
+  Refunded
+  PartiallyRefunded
+}
+
+enum RefundStatus {
+  None
+  Initiated
+  Pending
+  Completed
+  Failed
+}
+
+enum MarkupTypeDB {
+  Flight
+  Hotel
+}
+
+enum MarkupRuleType {
+  Default
+  Route
+  Airline
+  HotelCriteria
+}
+
+enum MarketType {
+  B2C
+  B2BDefault
+}
+
+enum ReportType {
+  Daily
+  Weekly
+  Monthly
+  Custom
+}
+
+enum StatementStatus {
+  Generated
+  Sent
+  Viewed
+  Accepted
+  Disputed
+}
+
+enum ActorType {
+  Admin
+  Agent
+  AgentUser
+  System
+}
+
+enum ActionCategory {
+  Authentication
+  Booking
+  Financial
+  Configuration
+  UserManagement
+  System
+}
+
+enum AuditStatus {
+  Success
+  Failure
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum RecipientType {
+  Admin
+  Agent
+  AgentUser
+}
+
+enum NotificationType {
+  Booking
+  Payment
+  System
+  Promotion
+  Alert
+}
+
+enum SettingType {
+  String
+  Number
+  Boolean
+  Json
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model Agent {
+  id                  String             @id @default(uuid()) @db.Uuid
+  agencyName          String
+  agencyCode          String             @unique
+  businessType        BusinessType
+  contactPersonName   String
+  email               String             @unique
+  phone               String
+  alternatePhone      String?
+  website             String?
+  addressLine1        String
+  addressLine2        String?
+  city                String
+  state               String?
+  country             String
+  postalCode          String
+  businessRegNumber   String?
+  taxId               String?
+  panNumber           String?
+  passwordHash        String
+  emailVerified       Boolean            @default(false)
+  phoneVerified       Boolean            @default(false)
+  verificationToken   String?
+  resetPasswordToken  String?
+  resetPasswordExpires DateTime?
+  status              AgentStatus        @default(Pending)
+  verificationStatus  VerificationStatus @default(Unverified)
+  walletBalance       Decimal            @default(0) @db.Decimal(15, 2)
+  creditLimit         Decimal            @default(0) @db.Decimal(15, 2)
+  availableCredit     Decimal            @default(0) @db.Decimal(15, 2)
+  commissionRate      Decimal            @default(0) @db.Decimal(5, 2)
+  useCustomMarkup     Boolean            @default(false)
+  permissions         Json?
+  lastLoginAt         DateTime?
+  deletedAt           DateTime?
+  createdBy           String?
+  updatedBy           String?
+  notes               String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  // Relations
+  users               AgentUser[]
+  bookings            Booking[]
+  wallet              Wallet?
+  agentMarkups        AgentMarkup[]
+  walletTransactions  WalletTransaction[]
+  creditTransactions  CreditTransaction[]
+  payments            Payment[]
+  bookingReports      BookingReport[]
+  financialStatements FinancialStatement[]
+
+  @@index([email])
+  @@index([agencyCode])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([createdAt])
+  @@map("agents")
+}
+
+model AgentUser {
+  id            String    @id @default(uuid()) @db.Uuid
+  agentId       String    @db.Uuid
+  firstName     String
+  lastName      String
+  email         String
+  username      String    @unique
+  passwordHash  String
+  profileImage  String?
+  role          UserRole  @default(Staff)
+  permissions   Json?
+  status        UserStatus @default(Active)
+  emailVerified Boolean   @default(false)
+  lastLoginAt   DateTime?
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  agent         Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+
+  @@unique([agentId, email])
+  @@index([agentId])
+  @@index([email])
+  @@index([status])
+  @@map("agent_users")
+}
+
+model AdminRole {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  code        String   @unique
+  description String?
+  permissions Json
+  level       Int      @default(99)
+  status      Status   @default(Active)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  adminUsers  AdminUser[]
+
+  @@index([status])
+  @@map("admin_roles")
+}
+
+model AdminUser {
+  id                    String     @id @default(uuid()) @db.Uuid
+  firstName             String
+  lastName              String
+  email                 String     @unique
+  phone                 String?
+  username              String     @unique
+  passwordHash          String
+  profileImage          String?
+  roleId                String     @db.Uuid
+  permissions           Json?
+  status                UserStatus @default(Active)
+  emailVerified         Boolean    @default(true)
+  resetPasswordToken    String?
+  resetPasswordExpires  DateTime?
+  lastLoginAt           DateTime?
+  deletedAt             DateTime?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  // Relations
+  role                  AdminRole  @relation(fields: [roleId], references: [id])
+
+  @@index([email])
+  @@index([roleId])
+  @@index([status])
+  @@map("admin_users")
+}
+
+model Booking {
+  id                       String              @id @default(uuid()) @db.Uuid
+  bookingReference         String              @unique
+  agentId                  String              @db.Uuid
+  bookedByUserId           String?             @db.Uuid
+  bookingType              BookingType
+  supplierName             String?
+  supplierBookingReference String?
+  supplierConfirmationCode String?
+  customerTitle            CustomerTitle
+  customerFirstName        String
+  customerLastName         String
+  customerEmail            String
+  customerPhone            String
+  baseFare                 Decimal             @db.Decimal(15, 2)
+  taxesAndFees             Decimal             @db.Decimal(15, 2)
+  supplierCost             Decimal             @db.Decimal(15, 2)
+  markupType               MarkupType
+  markupValue              Decimal             @db.Decimal(15, 2)
+  markupAmount             Decimal             @db.Decimal(15, 2)
+  commissionRate           Decimal             @default(0) @db.Decimal(5, 2)
+  commissionAmount         Decimal             @default(0) @db.Decimal(15, 2)
+  totalAmount              Decimal             @db.Decimal(15, 2)
+  currency                 String              @default("INR")
+  paymentStatus            PaymentStatus       @default(Pending)
+  paymentMethod            PaymentMethod
+  paymentGatewayTxnId      String?
+  bookingStatus            BookingStatus       @default(Pending)
+  confirmationSent         Boolean             @default(false)
+  ticketed                 Boolean             @default(false)
+  ticketNumber             String?
+  confirmedAt              DateTime?
+  cancelledAt              DateTime?
+  completedAt              DateTime?
+  failureReason            String?
+  failureCode              String?
+  cancellationReason       String?
+  cancellationCharges      Decimal             @default(0) @db.Decimal(15, 2)
+  refundAmount             Decimal             @default(0) @db.Decimal(15, 2)
+  ipAddress                String?
+  userAgent                String?
+  notes                    String?
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+
+  // Relations
+  agent             Agent               @relation(fields: [agentId], references: [id])
+  bookedByUser      AgentUser?          @relation(fields: [bookedByUserId], references: [id])
+  flightBookings    FlightBooking[]
+  hotelBookings     HotelBooking[]
+  walletTransactions WalletTransaction[]
+  creditTransactions CreditTransaction[]
+  payments          Payment[]
+
+  @@index([agentId])
+  @@index([bookingReference])
+  @@index([bookingStatus])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@map("bookings")
+}
+
+model FlightBooking {
+  id                String       @id @default(uuid()) @db.Uuid
+  bookingId         String       @db.Uuid
+  airlineCode       String
+  airlineName       String
+  flightNumber      String
+  originAirportCode String
+  originAirportName String
+  originCity        String
+  originCountry     String
+  destAirportCode   String
+  destAirportName   String
+  destCity          String
+  destCountry       String
+  departureDate     DateTime
+  departureTime     DateTime
+  arrivalDate       DateTime
+  arrivalTime       DateTime
+  cabinClass        CabinClass
+  mealPreference    String?
+  seatNumber        String?
+  baseFare          Decimal      @db.Decimal(15, 2)
+  taxes             Decimal      @db.Decimal(15, 2)
+  fareType          String?
+  pnr               String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  // Relations
+  booking           Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  passengers        FlightPassenger[]
+
+  @@index([bookingId])
+  @@index([departureDate])
+  @@index([flightNumber])
+  @@map("flight_bookings")
+}
+
+model FlightPassenger {
+  id                   String          @id @default(uuid()) @db.Uuid
+  flightBookingId      String          @db.Uuid
+  title                PassengerTitle
+  firstName            String
+  lastName             String
+  dateOfBirth          DateTime
+  gender               Gender
+  passportNumber       String?
+  passportExpiry       DateTime?
+  nationalId           String?
+  email                String?
+  phone                String?
+  passengerType        PassengerType
+  frequentFlyerAirline String?
+  frequentFlyerNumber  String?
+  mealPreference       String?
+  specialRequests      String?
+  wheelchairRequired   Boolean         @default(false)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  // Relations
+  flightBooking        FlightBooking   @relation(fields: [flightBookingId], references: [id], onDelete: Cascade)
+
+  @@index([flightBookingId])
+  @@map("flight_passengers")
+}
+
+model HotelBooking {
+  id                        String           @id @default(uuid()) @db.Uuid
+  bookingId                 String           @db.Uuid
+  hotelId                   String
+  hotelName                 String
+  hotelChain                String?
+  starRating                Int
+  addressLine1              String
+  addressLine2              String?
+  city                      String
+  state                     String?
+  country                   String
+  postalCode                String?
+  latitude                  Decimal?         @db.Decimal(10, 8)
+  longitude                 Decimal?         @db.Decimal(11, 8)
+  roomType                  String
+  roomTypeCode              String?
+  numberOfRooms             Int
+  numberOfAdults            Int
+  numberOfChildren          Int              @default(0)
+  childAges                 Json?
+  checkInDate               DateTime
+  checkOutDate              DateTime
+  numberOfNights            Int
+  mealPlan                  MealPlan         @default(RoomOnly)
+  amenities                 Json?
+  roomRatePerNight          Decimal          @db.Decimal(15, 2)
+  taxAndServiceCharge       Decimal          @db.Decimal(15, 2)
+  supplierConfirmationNumber String?
+  checkinInstructions       String?
+  freeCancellationBefore    DateTime?
+  cancellationPolicy        String?
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt
+
+  // Relations
+  booking                   Booking          @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([checkInDate])
+  @@index([hotelName])
+  @@map("hotel_bookings")
+}
+
+model Wallet {
+  id                    String        @id @default(uuid()) @db.Uuid
+  agentId               String        @unique @db.Uuid
+  currentBalance        Decimal       @default(0) @db.Decimal(15, 2)
+  blockedBalance        Decimal       @default(0) @db.Decimal(15, 2)
+  availableBalance      Decimal       @default(0) @db.Decimal(15, 2)
+  creditLimit           Decimal       @default(0) @db.Decimal(15, 2)
+  usedCredit            Decimal       @default(0) @db.Decimal(15, 2)
+  availableCredit       Decimal       @default(0) @db.Decimal(15, 2)
+  status                WalletStatus  @default(Active)
+  isCreditEnabled       Boolean       @default(false)
+  creditApproved        Boolean       @default(false)
+  creditApprovedBy      String?       @db.Uuid
+  creditApprovedAt      DateTime?
+  autoRechargeEnabled   Boolean       @default(false)
+  autoRechargeThreshold Decimal       @default(5000) @db.Decimal(15, 2)
+  autoRechargeAmount    Decimal       @default(10000) @db.Decimal(15, 2)
+  allowOverdraft        Boolean       @default(false)
+  overdraftLimit        Decimal       @default(0) @db.Decimal(15, 2)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  // Relations
+  agent                  Agent         @relation(fields: [agentId], references: [id])
+  transactions          WalletTransaction[]
+
+  @@index([agentId])
+  @@index([status])
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id                    String             @id @default(uuid()) @db.Uuid
+  walletId              String             @db.Uuid
+  agentId               String             @db.Uuid
+  bookingId             String?            @db.Uuid
+  transactionReference  String             @unique
+  transactionType       TransactionType
+  transactionCategory   TransactionCategory
+  amount                Decimal            @db.Decimal(15, 2)
+  openingBalance        Decimal            @db.Decimal(15, 2)
+  closingBalance        Decimal            @db.Decimal(15, 2)
+  paymentMethod         String?
+  paymentGateway        String?
+  gatewayTransactionId  String?
+  bankName              String?
+  accountNumber         String?
+  transactionRefNumber  String?
+  utrNumber             String?
+  status                TransactionStatus  @default(Pending)
+  requiresApproval      Boolean            @default(false)
+  approvedBy            String?            @db.Uuid
+  approvedAt            DateTime?
+  rejectionReason       String?
+  receiptUrl            String?
+  invoiceNumber         String?
+  ipAddress             String?
+  notes                 String?
+  attachments           Json?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  completedAt           DateTime?
+
+  // Relations
+  wallet                Wallet             @relation(fields: [walletId], references: [id])
+  agent                 Agent              @relation(fields: [agentId], references: [id])
+  booking               Booking?           @relation(fields: [bookingId], references: [id])
+  payments              Payment[]
+
+  @@index([walletId])
+  @@index([agentId])
+  @@index([transactionReference])
+  @@index([transactionType])
+  @@index([status])
+  @@index([createdAt])
+  @@map("wallet_transactions")
+}
+
+model CreditTransaction {
+  id                    String              @id @default(uuid()) @db.Uuid
+  agentId               String              @db.Uuid
+  bookingId             String?             @db.Uuid
+  transactionReference  String              @unique
+  transactionType       CreditTransactionType
+  amount                Decimal             @db.Decimal(15, 2)
+  openingCredit         Decimal             @db.Decimal(15, 2)
+  closingCredit         Decimal             @db.Decimal(15, 2)
+  oldCreditLimit        Decimal?            @db.Decimal(15, 2)
+  newCreditLimit        Decimal?            @db.Decimal(15, 2)
+  status                TransactionStatus   @default(Pending)
+  approvedBy            String?             @db.Uuid
+  approvedAt            DateTime?
+  validTill             DateTime?
+  notes                 String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  // Relations
+  agent                 Agent               @relation(fields: [agentId], references: [id])
+  booking               Booking?            @relation(fields: [bookingId], references: [id])
+
+  @@index([agentId])
+  @@index([transactionReference])
+  @@index([status])
+  @@index([createdAt])
+  @@map("credit_transactions")
+}
+
+model Payment {
+  id                     String                @id @default(uuid()) @db.Uuid
+  bookingId              String?               @db.Uuid
+  walletTransactionId    String?               @db.Uuid
+  agentId                String                @db.Uuid
+  paymentReference       String                @unique
+  paymentType            PaymentType
+  amount                 Decimal               @db.Decimal(15, 2)
+  currency               String                @default("INR")
+  paymentMethod          String                @db.VarChar(50)
+  paymentGateway         PaymentGateway
+  gatewayOrderId         String?
+  gatewayPaymentId       String?
+  gatewayTransactionId   String?
+  cardLast4Digits        String?
+  cardHolderName         String?
+  cardType               String?
+  bankName               String?
+  bankTransactionId      String?
+  status                 PaymentGatewayStatus  @default(Initiated)
+  gatewayResponse        Json?
+  failureReason          String?
+  refundAmount           Decimal               @default(0) @db.Decimal(15, 2)
+  refundReference        String?
+  refundStatus           RefundStatus          @default(None)
+  ipAddress              String?
+  userAgent              String?
+  deviceInfo             Json?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  completedAt            DateTime?
+  failedAt               DateTime?
+
+  // Relations
+  booking                Booking?              @relation(fields: [bookingId], references: [id])
+  walletTransaction      WalletTransaction?    @relation(fields: [walletTransactionId], references: [id])
+  agent                  Agent                 @relation(fields: [agentId], references: [id])
+
+  @@index([bookingId])
+  @@index([agentId])
+  @@index([paymentReference])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model AgentMarkup {
+  id                    String        @id @default(uuid()) @db.Uuid
+  agentId               String        @db.Uuid
+  name                  String
+  type                  MarkupTypeDB
+  ruleType              MarkupRuleType
+  status                Status        @default(Active)
+  priority              Int           @default(0)
+  mode                  MarkupType
+  value                 Decimal       @db.Decimal(15, 2)
+  flightOriginAirport   String?
+  flightDestAirport     String?
+  flightAirlineCode     String?
+  flightCabinClass      String?
+  hotelStarRating       Int?
+  hotelCity             String?
+  hotelPropertyType     String?
+  validFrom             DateTime?
+  validTo               DateTime?
+  isAdminOverride       Boolean       @default(false)
+  createdBy             String?       @db.Uuid
+  updatedBy             String?       @db.Uuid
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  // Relations
+  agent                 Agent         @relation(fields: [agentId], references: [id])
+
+  @@index([agentId])
+  @@index([type])
+  @@index([status])
+  @@map("agent_markups")
+}
+
+model GlobalMarkup {
+  id                    String        @id @default(uuid()) @db.Uuid
+  name                  String
+  type                  MarkupTypeDB
+  ruleType              MarkupRuleType
+  marketType            MarketType    @default(B2C)
+  status                Status        @default(Active)
+  priority              Int           @default(0)
+  mode                  MarkupType
+  value                 Decimal       @db.Decimal(15, 2)
+  flightOriginAirport   String?
+  flightDestAirport     String?
+  flightAirlineCode     String?
+  flightCabinClass      String?
+  hotelStarRating       Int?
+  hotelCity             String?
+  hotelPropertyType     String?
+  minBookingValue       Decimal?      @db.Decimal(15, 2)
+  maxBookingValue       Decimal?      @db.Decimal(15, 2)
+  validFrom             DateTime?
+  validTo               DateTime?
+  createdBy             String?       @db.Uuid
+  updatedBy             String?       @db.Uuid
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([type])
+  @@index([ruleType])
+  @@index([status])
+  @@map("global_markups")
+}
+
+model BookingReport {
+  id                      String    @id @default(uuid()) @db.Uuid
+  agentId                 String?   @db.Uuid
+  reportDate              DateTime
+  reportType              ReportType
+  periodStart             DateTime
+  periodEnd               DateTime
+  totalBookings           Int       @default(0)
+  flightBookings          Int       @default(0)
+  hotelBookings           Int       @default(0)
+  confirmedBookings       Int       @default(0)
+  pendingBookings         Int       @default(0)
+  cancelledBookings       Int       @default(0)
+  failedBookings          Int       @default(0)
+  totalRevenue            Decimal   @default(0) @db.Decimal(15, 2)
+  totalMarkup             Decimal   @default(0) @db.Decimal(15, 2)
+  totalCommission         Decimal   @default(0) @db.Decimal(15, 2)
+  averageBookingValue     Decimal   @default(0) @db.Decimal(15, 2)
+  averageMarkupPerBooking Decimal   @default(0) @db.Decimal(15, 2)
+  walletPayments          Int       @default(0)
+  creditPayments          Int       @default(0)
+  gatewayPayments         Int       @default(0)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  agent                   Agent?    @relation(fields: [agentId], references: [id])
+
+  @@unique([agentId, reportDate, reportType])
+  @@index([agentId])
+  @@index([reportDate])
+  @@map("booking_reports")
+}
+
+model FinancialStatement {
+  id                      String              @id @default(uuid()) @db.Uuid
+  agentId                 String              @db.Uuid
+  statementPeriod         String              @unique
+  periodStart             DateTime
+  periodEnd               DateTime
+  openingBalance          Decimal             @db.Decimal(15, 2)
+  totalRecharges          Decimal             @default(0) @db.Decimal(15, 2)
+  totalRefunds            Decimal             @default(0) @db.Decimal(15, 2)
+  totalCredits            Decimal             @default(0) @db.Decimal(15, 2)
+  totalBookings           Decimal             @default(0) @db.Decimal(15, 2)
+  totalCancellations      Decimal             @default(0) @db.Decimal(15, 2)
+  totalDebits             Decimal             @default(0) @db.Decimal(15, 2)
+  totalCommissionEarned   Decimal             @default(0) @db.Decimal(15, 2)
+  totalMarkupEarned       Decimal             @default(0) @db.Decimal(15, 2)
+  adjustments             Decimal             @default(0) @db.Decimal(15, 2)
+  closingBalance          Decimal             @db.Decimal(15, 2)
+  openingCredit           Decimal             @default(0) @db.Decimal(15, 2)
+  creditUsed              Decimal             @default(0) @db.Decimal(15, 2)
+  creditRepaid            Decimal             @default(0) @db.Decimal(15, 2)
+  closingCredit           Decimal             @default(0) @db.Decimal(15, 2)
+  status                  StatementStatus     @default(Generated)
+  statementUrl            String?
+  generatedAt             DateTime            @default(now())
+  sentAt                  DateTime?
+  viewedAt                DateTime?
+
+  // Relations
+  agent                   Agent               @relation(fields: [agentId], references: [id])
+
+  @@unique([agentId, statementPeriod])
+  @@index([agentId])
+  @@index([statementPeriod])
+  @@index([status])
+  @@map("financial_statements")
+}
+
+model AuditLog {
+  id                 String          @id @default(uuid()) @db.Uuid
+  actorId            String          @db.Uuid
+  actorType          ActorType
+  actorEmail         String?
+  action             String
+  actionCategory     ActionCategory
+  targetEntity       String
+  targetId           String?         @db.Uuid
+  actionDescription  String          @db.Text
+  oldValues          Json?
+  newValues          Json?
+  ipAddress          String?
+  userAgent          String?         @db.Text
+  requestMethod      String?
+  requestUrl         String?         @db.Text
+  status             AuditStatus
+  errorMessage       String?         @db.Text
+  createdAt          DateTime        @default(now())
+
+  @@index([actorId])
+  @@index([actionCategory])
+  @@index([targetEntity, targetId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model SystemLog {
+  id                String          @id @default(uuid()) @db.Uuid
+  level             LogLevel
+  category          String
+  message           String          @db.Text
+  details           Json?
+  requestId         String?
+  userId            String?         @db.Uuid
+  userType          String?
+  exceptionClass    String?
+  exceptionMessage  String?         @db.Text
+  stackTrace        String?         @db.Text
+  createdAt         DateTime        @default(now())
+
+  @@index([level])
+  @@index([category])
+  @@index([createdAt])
+  @@map("system_logs")
+}
+
+model Notification {
+  id              String           @id @default(uuid()) @db.Uuid
+  recipientId     String           @db.Uuid
+  recipientType   RecipientType
+  title           String
+  message         String           @db.Text
+  type            NotificationType
+  referenceType   String?
+  referenceId     String?          @db.Uuid
+  isRead          Boolean          @default(false)
+  readAt          DateTime?
+  sentViaEmail    Boolean          @default(false)
+  sentViaSms      Boolean          @default(false)
+  sentViaPush     Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  expiresAt       DateTime?
+
+  @@index([recipientId, recipientType])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model SystemSetting {
+  id          String      @id @default(uuid()) @db.Uuid
+  key         String      @unique
+  value       String      @db.Text
+  type        SettingType
+  category    String?
+  description String?     @db.Text
+  isEditable  Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([category])
+  @@map("system_settings")
+}
