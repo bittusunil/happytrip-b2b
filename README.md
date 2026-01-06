@@ -2,110 +2,95 @@
 
 A comprehensive B2B travel booking platform built with NestJS, PostgreSQL, and Prisma.
 
-## 🚀 Features
+## ✨ Features
 
-- **Authentication & Authorization** - JWT-based authentication with role-based access control
-- **Agent Management** - Multi-agent system with sub-users and permissions
-- **Wallet System** - Virtual wallet with credit management and transaction tracking
-- **Booking System** - Flight and hotel booking management
-- **Admin Panel** - Comprehensive admin dashboard with analytics
-- **Reporting** - Detailed financial and booking reports
-- **Markup Configuration** - Flexible pricing and markup rules
-- **Notifications** - In-app notification system
-- **Audit Logging** - Complete audit trail for all actions
+- 🔐 **JWT Authentication** - Secure agent authentication with role-based access
+- 👥 **Agent Management** - Multi-agent system with sub-users and permissions
+- 💰 **Wallet System** - Virtual wallet with credit management
+- ✈️🏨 **Booking System** - Flight and hotel booking management
+- 🛡️ **Admin Panel** - Comprehensive admin dashboard
+- 📊 **Reports** - Detailed financial and booking reports
+- 🏷️ **Markup Configuration** - Flexible pricing rules
+- 🔔 **Notifications** - In-app notification system
+- 📝 **Audit Logging** - Complete audit trail
+- 📘 **Swagger Documentation** - Interactive API docs at `/api/docs`
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [NestJS](https://nestjs.com/) - Progressive Node.js framework
-- **ORM**: [Prisma](https://www.prisma.io/) - Type-safe ORM
-- **Database**: PostgreSQL - Can be self-hosted or use Railway
+- **Framework**: NestJS 10.x
+- **ORM**: Prisma
+- **Database**: PostgreSQL
 - **Validation**: class-validator & class-transformer
 - **API Docs**: Swagger/OpenAPI
-- **Authentication**: JWT + Passport
+- **Auth**: JWT + Passport
 
 ## 📋 Prerequisites
 
 - Node.js >= 18.x
-- PostgreSQL database
+- PostgreSQL database (Railway recommended)
 - npm or yarn
 
-## 🔧 Installation
+## 🚀 Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/happytrip-b2b.git
+# Clone repository
+git clone https://github.com/bittusunil/happytrip-b2b.git
 cd happytrip-b2b
 
 # Install dependencies
 npm install
 
-# Copy environment variables
+# Configure environment
 cp .env.example .env
+# Add your DATABASE_URL to .env
 
-# Update .env with your database URL
-# DATABASE_URL="postgresql://user:password@localhost:5432/happytrip_b2b?schema=public"
-
-# Generate Prisma Client
+# Setup database
 npx prisma generate
-
-# Push schema to database
 npx prisma db push
 
-# Run development server
+# Start development server
 npm run start:dev
 ```
 
-## 🌐 API Documentation
-
-Once the server is running, visit:
-
-- **API Docs**: http://localhost:3000/api/docs
-- **Health Check**: http://localhost:3000/api
+Visit **http://localhost:3000/api/docs** for interactive API documentation.
 
 ## 📁 Project Structure
 
 ```
 src/
 ├── modules/              # Feature modules
-│   ├── auth/            # Authentication & authorization
+│   ├── auth/            # Authentication
 │   ├── agents/          # Agent management
 │   ├── bookings/        # Booking management
-│   ├── wallets/         # Wallet & transactions
+│   ├── wallets/         # Wallet system
 │   ├── admin/           # Admin panel
-│   ├── reports/         # Reports & analytics
-│   ├── markups/         # Pricing & markups
+│   ├── reports/         # Reports
+│   ├── markups/         # Pricing
 │   ├── notifications/   # Notifications
-│   └── audit/           # Audit logging
+│   └── audit/           # Audit logs
 ├── common/              # Shared utilities
-│   ├── decorators/      # Custom decorators
-│   ├── guards/          # Auth guards
-│   ├── filters/         # Exception filters
-│   └── dto/             # Shared DTOs
 ├── config/              # Configuration
-├── prisma/              # Prisma service
-├── app.module.ts        # Root module
-└── main.ts              # Entry point
-prisma/
-└── schema.prisma        # Database schema
+└── prisma/              # Prisma service
 ```
 
 ## 🔐 Environment Variables
 
 ```env
-# Database
 DATABASE_URL="postgresql://user:password@host:5432/dbname"
-
-# JWT
 JWT_SECRET="your-secret-key"
 JWT_EXPIRES_IN="7d"
-
-# Application
 PORT=3000
 NODE_ENV="development"
-
-# CORS
 CORS_ORIGIN="*"
 ```
+
+## 📚 API Documentation
+
+Once the server is running, visit:
+- **API Docs**: http://localhost:3000/api/docs
+- **API**: http://localhost:3000/api
+
+See [SWAGGER-API-DOCS.md](SWAGGER-API-DOCS.md) for detailed usage guide.
 
 ## 🧪 Testing
 
@@ -130,7 +115,16 @@ npm run build
 npm run start:prod
 ```
 
-## 📚 API Endpoints
+### Railway Deployment
+
+1. Push code to GitHub
+2. Go to [Railway.app](https://railway.app)
+3. Deploy from GitHub repo
+4. Add PostgreSQL plugin
+5. Add environment variables
+6. Deploy!
+
+## 📖 API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new agent
@@ -143,6 +137,7 @@ npm run start:prod
 - `GET /api/agents` - List all agents
 - `GET /api/agents/:id` - Get agent details
 - `PATCH /api/agents/:id/status` - Update agent status
+- `PATCH /api/agents/:id/credit` - Update credit limit
 
 ### Wallets
 - `GET /api/wallets` - Get wallet details
@@ -152,27 +147,16 @@ npm run start:prod
 ### Bookings
 - `GET /api/bookings` - List bookings
 - `GET /api/bookings/:id` - Get booking details
+- `POST /api/bookings` - Create booking
 
 ### Admin
 - `GET /api/admin/dashboard` - Admin dashboard
 - `GET /api/admin/activity` - Recent activity
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## 📝 License
 
-This project is licensed under the MIT License.
-
-## 👥 Team
-
-- HappyTrip B2B Team
+MIT
 
 ---
 
-Built with ❤️ using NestJS
+Built with ❤️ using [NestJS](https://nestjs.com/)
