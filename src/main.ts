@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { SwaggerConfigService } from './config/swagger.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
 
   // Enable CORS
   app.enableCors({
@@ -44,17 +47,24 @@ async function bootstrap() {
   const config = SwaggerConfigService.getBuilder().build();
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup(
-    'api/docs',
-    app,
-    document,
-    SwaggerConfigService.getCustomOptions(),
-  );
+  // Use custom options for better Vercel compatibility
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'B2B Travel Portal API Docs',
+    customCss: '.swagger-ui .topbar { display: none }',
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'none',
+      filter: true,
+      showRequestDuration: true,
+      tryItOutEnabled: true,
+    },
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  console.log(`
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`
 ┌─────────────────────────────────────────────────────────────────────┐
 │                                                                      │
 │   🚀 B2B Travel Portal API                                          │
@@ -68,6 +78,7 @@ async function bootstrap() {
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
   `);
+  }
 }
 
 bootstrap();

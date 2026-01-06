@@ -204,7 +204,6 @@ For list endpoints, use these query parameters:
         maxDisplayedTags: 10,
         defaultModelsExpandDepth: 1,
         defaultModelExpandDepth: 1,
-        displayRequestDuration: true,
         tryItOutEnabled: true,
         syntaxHighlight: {
           activate: true,
@@ -218,113 +217,15 @@ For list endpoints, use these query parameters:
       },
       customSiteTitle: 'B2B Travel Portal API Docs',
       customCss: `
-        .topbar-wrapper img { content: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0Mjk5ZTEiLz4KPHBhdGggZD0iTTIwIDEwVjMwTTEwIDIwSDMwTTIwIDMwVjEwTTMwIDIwSDEwIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K'); }
         .swagger-ui .topbar { background-color: #4299e1; }
         .swagger-ui .topbar-wrapper .link { color: white; }
         .swagger-ui .info { margin: 20px 0; }
         .swagger-ui .info .title { color: #4299e1; font-size: 32px; }
-        .swagger-ui .info description { font-size: 14px; }
-        .swagger-ui .tag {
-          display: flex;
-          align-items: center;
-          padding: 10px 0;
-          border-bottom: 1px solid #e2e8f0;
-        }
-        .swagger-ui .tag-desc {
-          width: 100%;
-          padding: 10px 0;
-          font-size: 14px;
-        }
-        .swagger-ui .opblock-tag {
-          font-size: 16px;
-          font-weight: 600;
-          color: #2d3748;
-        }
-        .swagger-ui .opblock {
-          margin: 10px 0;
-          border-radius: 6px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        .swagger-ui .opblock { margin: 10px 0; border-radius: 6px; }
         .swagger-ui .opblock.get { border-color: #4299e1; }
         .swagger-ui .opblock.post { border-color: #48bb78; }
         .swagger-ui .opblock.patch { border-color: #ed8936; }
         .swagger-ui .opblock.delete { border-color: #f56565; }
-        .swagger-ui .opblock .opblock-summary {
-          padding: 10px 15px;
-          border-radius: 6px;
-        }
-        .swagger-ui .opblock.get .opblock-summary { background-color: #ebf8ff; }
-        .swagger-ui .opblock.post .opblock-summary { background-color: #f0fff4; }
-        .swagger-ui .opblock.patch .opblock-summary { background-color: #fffaf0; }
-        .swagger-ui .opblock.delete .opblock-summary { background-color: #fff5f5; }
-        .swagger-ui .scheme-container {
-          margin: 10px 0;
-          padding: 10px;
-          background: #f7fafc;
-          border-radius: 6px;
-        }
-        .swagger-ui .response-col_status {
-          color: white;
-          font-size: 12px;
-          font-weight: 600;
-          min-width: 60px;
-          padding: 5px 10px;
-          text-align: center;
-          border-radius: 4px;
-        }
-        .swagger-ui .response-col_status .response-200,
-        .swagger-ui .response-col_status .response-201 {
-          background-color: #48bb78;
-        }
-        .swagger-ui .response-col_status .response-400,
-        .swagger-ui .response-col_status .response-409 {
-          background-color: #ed8936;
-        }
-        .swagger-ui .response-col_status .response-401,
-        .swagger-ui .response-col_status .response-403,
-        .swagger-ui .response-col_status .response-404 {
-          background-color: #f56565;
-        }
-        .swagger-ui .response-col_status .response-500 {
-          background-color: #e53e3e;
-        }
-        .swagger-ui table {
-          border-collapse: separate;
-          border-spacing: 0;
-        }
-        .swagger-ui table.headers thead tr td {
-          font-size: 12px;
-          font-weight: 600;
-          color: #2d3748;
-          border-bottom: 2px solid #e2e8f0;
-        }
-        .swagger-ui .parameters-col_description p {
-          margin: 0;
-          font-size: 13px;
-        }
-        .swagger-ui .parameter__name {
-          color: #2d3748;
-          font-size: 14px;
-          font-weight: 600;
-        }
-        .swagger-ui .parameter__type {
-          color: #718096;
-          font-size: 12px;
-        }
-        .swagger-ui .model-title {
-          color: #2d3748;
-          font-size: 16px;
-          font-weight: 600;
-        }
-        .swagger-ui .property-name {
-          color: #2d3748;
-          font-size: 13px;
-          font-weight: 600;
-        }
-        .swagger-ui .property-type {
-          color: #718096;
-          font-size: 12px;
-        }
       `,
     };
   }
